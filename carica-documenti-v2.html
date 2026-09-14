@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ContoEnergia — Caricamento documenti</title>
+<style>
+  :root {
+    --green: #1f8a3d;
+    --green-dark: #146428;
+    --bg: #f4f7f3;
+    --card: #ffffff;
+    --text: #1a1a1a;
+    --muted: #666;
+    --danger: #d1394a;
+    --border: #e0e4de;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px 16px 60px;
+  }
+  .wrap { max-width: 520px; margin: 0 auto; }
+  .logo-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; margin-bottom: 20px;
+  }
+  .logo-row .logo-img {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    object-fit: cover;
+  }
+  .logo-row .logo-text { text-align: left; }
+  .logo-row .logo-text .brand {
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--green-dark);
+    letter-spacing: 0.2px;
+    line-height: 1.1;
+  }
+  .logo-row .logo-text .tagline {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--green-dark);
+    opacity: 0.75;
+    line-height: 1.2;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 28px 24px;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.06);
+    border: 1px solid var(--border);
+  }
+  h1 { font-size: 22px; margin: 0 0 6px; text-align: center; }
+  p.subtitle {
+    text-align: center; color: var(--muted); margin: 0 0 14px;
+    font-size: 15px; line-height: 1.5;
+  }
+
+  .pratica-number {
+    text-align: right;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 12px;
+    margin-bottom: 6px;
+    letter-spacing: 0.2px;
+  }
+
+  /* Countdown */
+  .countdown-box {
+    background: #fff5f5;
+    border: 1px solid #f3c9ce;
+    border-radius: 10px;
+    padding: 9px 14px;
+    text-align: center;
+    margin-bottom: 18px;
+  }
+  .countdown-label {
+    font-size: 13px; color: var(--danger); font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.3px;
+  }
+  .countdown-timer {
+    font-size: 16px; font-weight: 800; color: var(--danger);
+    letter-spacing: 0.5px; font-variant-numeric: tabular-nums;
+  }
+  .countdown-sub { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+
+  /* Document sections */
+  .doc-section {
+    margin-bottom: 20px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .doc-section:last-of-type { border-bottom: none; }
+
+  .doc-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .doc-title .check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--border);
+    color: #fff;
+    font-size: 11px;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  .doc-title .check.done { background: var(--green); }
+
+  .doc-desc {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin: 0 0 10px 24px;
+  }
+
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    background: #fafbfa;
+  }
+  .upload-zone.dragover { border-color: var(--green); background: #eefaf0; }
+  .upload-zone .main-text { font-weight: 600; font-size: 13.5px; }
+  .upload-zone .sub-text { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+
+  .file-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+  .file-item {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #f4f7f3; border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 12px; font-size: 12.5px;
+  }
+  .file-item .fname {
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 78%;
+  }
+  .file-item .remove-btn {
+    color: var(--danger); background: none; border: none;
+    font-size: 15px; cursor: pointer; padding: 0 4px; font-weight: 700;
+  }
+
+  button.submit-btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 15px;
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  button.submit-btn:hover { background: var(--green-dark); }
+  button.submit-btn:disabled { background: #a8bfa8; cursor: not-allowed; }
+
+  .status-msg {
+    text-align: center; margin-top: 14px; font-size: 14px; font-weight: 600; display: none;
+  }
+  .status-msg.success { color: var(--green-dark); display: block; }
+  .status-msg.error { color: var(--danger); display: block; }
+  .status-msg.loading { color: var(--muted); display: block; }
+
+  .gdpr-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 16px;
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .gdpr-row input[type="checkbox"] {
+    margin-top: 2px;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    accent-color: var(--green);
+  }
+
+  .whatsapp-hint {
+    display: block;
+    text-align: center;
+    background: #e9f9ee;
+    border: 1px solid #bfe8cc;
+    color: var(--green-dark);
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 1.4;
+    border-radius: 8px;
+    padding: 7px 10px;
+    margin-bottom: 16px;
+  }
+
+  .whatsapp-float {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    background: #25D366;
+    border-radius: 50%;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    text-decoration: none;
+    z-index: 999;
+    transition: transform 0.15s;
+  }
+  .whatsapp-float:hover { transform: scale(1.06); }
+  .whatsapp-float svg { width: 28px; height: 28px; }
+  .whatsapp-cta:hover { background: #d9f3e2; }
+
+  .secure-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 10px;
+  }
+  .secure-badge svg { flex-shrink: 0; }
+
+  .process-note {
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--muted);
+    background: #f4f7f3;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 14px;
+  }
+
+  .footer-note {
+    text-align: center; font-size: 12px; color: var(--muted); margin-top: 18px;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="logo-row">
+    <img src="data:image/png;base64,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" alt="ContoEnergia" class="logo-img">
+    <div class="logo-text">
+      <div class="brand">ContoEnergia</div>
+      <div class="tagline">Impianti Fotovoltaici Residenziali in Tutta Italia Per Tutti</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="pratica-number">N° ID8402</div>
+
+    <p class="whatsapp-hint">Vuole parlare con qualcuno che La assista? Clicchi sul pulsante WhatsApp in basso a destra.</p>
+
+    <h1>Caricamento documenti</h1>
+    <p class="subtitle">Gentile Cliente, la lista d'attesa per le verifiche è lunga. Caricando subito i documenti, il nostro ufficio finanziario potrà controllare la Sua situazione bancaria e la Sua idoneità a ricevere il contributo GSE senza ulteriori ritardi.</p>
+
+    <div class="countdown-box">
+      <div class="countdown-label">⏱ Da fare entro 7 giorni</div>
+    </div>
+
+    <form id="uploadForm">
+
+      <div class="doc-section" data-doc="bolletta">
+        <div class="doc-title"><span class="check" id="check-bolletta"></span> Ultima bolletta elettrica</div>
+        <p class="doc-desc">Anche una foto leggibile va bene</p>
+        <div class="upload-zone" data-target="input-bolletta">
+          <div class="main-text">Tocchi qui per caricare</div>
+          <div class="sub-text">Foto o PDF</div>
+        </div>
+        <input type="file" id="input-bolletta" class="hidden-input" data-key="bolletta" accept="image/*,application/pdf" style="display:none">
+        <div class="file-list" id="list-bolletta"></div>
+      </div>
+
+      <div class="doc-section" data-doc="buste_paga">
+        <div class="doc-title"><span class="check" id="check-buste_paga"></span> Ultime 3 buste paga</div>
+        <p class="doc-desc">Carichi tutte e 3 le buste paga insieme o una alla volta</p>
+        <div class="upload-zone" data-target="input-buste_paga">
+          <div class="main-text">Tocchi qui per caricare</div>
+          <div class="sub-text">Foto o PDF — più file insieme</div>
+        </div>
+        <input type="file" id="input-buste_paga" class="hidden-input" data-key="buste_paga" multiple accept="image/*,application/pdf" style="display:none">
+        <div class="file-list" id="list-buste_paga"></div>
+      </div>
+
+      <div class="doc-section" data-doc="carta_identita">
+        <div class="doc-title"><span class="check" id="check-carta_identita"></span> Carta d'identità (fronte e retro)</div>
+        <p class="doc-desc">Carichi entrambi i lati, anche come due foto separate</p>
+        <div class="upload-zone" data-target="input-carta_identita">
+          <div class="main-text">Tocchi qui per caricare</div>
+          <div class="sub-text">Foto o PDF — più file insieme</div>
+        </div>
+        <input type="file" id="input-carta_identita" class="hidden-input" data-key="carta_identita" multiple accept="image/*,application/pdf" style="display:none">
+        <div class="file-list" id="list-carta_identita"></div>
+      </div>
+
+      <div class="doc-section" data-doc="codice_fiscale">
+        <div class="doc-title"><span class="check" id="check-codice_fiscale"></span> Codice fiscale (fronte e retro)</div>
+        <p class="doc-desc">Carichi entrambi i lati, anche come due foto separate</p>
+        <div class="upload-zone" data-target="input-codice_fiscale">
+          <div class="main-text">Tocchi qui per caricare</div>
+          <div class="sub-text">Foto o PDF — più file insieme</div>
+        </div>
+        <input type="file" id="input-codice_fiscale" class="hidden-input" data-key="codice_fiscale" multiple accept="image/*,application/pdf" style="display:none">
+        <div class="file-list" id="list-codice_fiscale"></div>
+      </div>
+
+      <div class="doc-section" data-doc="iban">
+        <div class="doc-title"><span class="check" id="check-iban"></span> IBAN</div>
+        <p class="doc-desc">Va bene una foto della carta, di un estratto conto o dell'app della banca dove si vede l'IBAN</p>
+        <div class="upload-zone" data-target="input-iban">
+          <div class="main-text">Tocchi qui per caricare</div>
+          <div class="sub-text">Foto o PDF</div>
+        </div>
+        <input type="file" id="input-iban" class="hidden-input" data-key="iban" accept="image/*,application/pdf" style="display:none">
+        <div class="file-list" id="list-iban"></div>
+      </div>
+
+      <div class="gdpr-row">
+        <input type="checkbox" id="gdprConsent" required>
+        <label for="gdprConsent">Acconsento al trattamento dei miei dati personali e dei documenti caricati, in conformità al GDPR, da parte di Energia SSP S.R.L.S. (ContoEnergia) esclusivamente ai fini della Mia pratica.</label>
+      </div>
+
+      <p class="process-note">📋 Un nostro operatore verificherà i documenti ricevuti entro 48 ore lavorative.</p>
+
+      <button type="submit" class="submit-btn" id="submitBtn">Invia documenti</button>
+      <div class="secure-badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Connessione sicura e crittografata
+      </div>
+      <div class="status-msg" id="statusMsg"></div>
+    </form>
+
+    <div class="footer-note">I Suoi dati sono trattati in conformità al GDPR e utilizzati esclusivamente per la Sua pratica ContoEnergia.<br><br>Energia SSP S.R.L.S. — P.IVA 16505161006<br>Ufficio Roma: Via Aventina 7, 00153 Roma<br><a href="https://www.contoenergia.it.com/" style="color: var(--green-dark); text-decoration: none; font-weight: 600;" target="_blank">www.contoenergia.it.com</a></div>
+  </div>
+</div>
+
+<a href="https://wa.me/00000000000" class="whatsapp-float" target="_blank" aria-label="Scriva su WhatsApp">
+  <svg viewBox="0 0 24 24" fill="white"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2zm5.8 14.03c-.24.68-1.4 1.32-1.93 1.36-.53.04-1.03.24-3.47-.72-2.94-1.15-4.8-4.14-4.94-4.33-.14-.19-1.18-1.57-1.18-3 0-1.42.75-2.12 1.01-2.41.27-.29.58-.36.78-.36.19 0 .39 0 .56.01.18.01.42-.07.66.5.24.58.82 2 .89 2.15.07.14.12.31.02.5-.1.19-.15.31-.29.48-.14.17-.3.37-.43.5-.14.14-.29.29-.13.57.17.29.75 1.24 1.61 2.01 1.11.99 2.05 1.3 2.33 1.44.29.14.46.12.63-.07.17-.19.72-.84.91-1.13.19-.29.38-.24.63-.14.26.09 1.65.78 1.94.92.29.14.48.21.55.33.07.12.07.68-.17 1.36z"/></svg>
+</a>
+
+<script>
+  // ====== CONFIGURAZIONE ======
+  const WEBHOOK_URL = "https://n8n.contoenergia.it.com/webhook/carica-documenti";
+  const PRATICA_ID = "ID8402";
+
+  // Countdown rimosso — sostituito con disclaimer statico "entro 7 giorni"
+
+  // ====== UPLOAD PER SEZIONE ======
+  const docKeys = ["bolletta", "buste_paga", "carta_identita", "codice_fiscale", "iban"];
+  const filesByDoc = {};
+  docKeys.forEach(k => filesByDoc[k] = []);
+
+  document.querySelectorAll(".upload-zone").forEach(zone => {
+    const inputId = zone.getAttribute("data-target");
+    const input = document.getElementById(inputId);
+    const key = input.getAttribute("data-key");
+
+    zone.addEventListener("click", () => input.click());
+    zone.addEventListener("dragover", (e) => { e.preventDefault(); zone.classList.add("dragover"); });
+    zone.addEventListener("dragleave", () => zone.classList.remove("dragover"));
+    zone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      zone.classList.remove("dragover");
+      addFiles(key, e.dataTransfer.files);
+    });
+    input.addEventListener("change", () => addFiles(key, input.files));
+  });
+
+  function addFiles(key, fileArray) {
+    for (const f of fileArray) filesByDoc[key].push(f);
+    renderFileList(key);
+  }
+
+  function renderFileList(key) {
+    const listEl = document.getElementById("list-" + key);
+    const checkEl = document.getElementById("check-" + key);
+    listEl.innerHTML = "";
+    filesByDoc[key].forEach((f, idx) => {
+      const item = document.createElement("div");
+      item.className = "file-item";
+      item.innerHTML = `
+        <span class="fname">${f.name}</span>
+        <button type="button" class="remove-btn" data-key="${key}" data-idx="${idx}">✕</button>
+      `;
+      listEl.appendChild(item);
+    });
+    listEl.querySelectorAll(".remove-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const k = e.target.getAttribute("data-key");
+        const idx = parseInt(e.target.getAttribute("data-idx"), 10);
+        filesByDoc[k].splice(idx, 1);
+        renderFileList(k);
+      });
+    });
+    checkEl.classList.toggle("done", filesByDoc[key].length > 0);
+  }
+
+  // ====== SUBMIT ======
+  const form = document.getElementById("uploadForm");
+  const submitBtn = document.getElementById("submitBtn");
+  const statusMsg = document.getElementById("statusMsg");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!document.getElementById("gdprConsent").checked) {
+      showStatus("Deve accettare il trattamento dei dati per procedere.", "error");
+      return;
+    }
+
+    const totalFiles = docKeys.reduce((sum, k) => sum + filesByDoc[k].length, 0);
+    if (totalFiles === 0) {
+      showStatus("Carichi almeno un documento prima di inviare.", "error");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("pratica_id", PRATICA_ID);
+    docKeys.forEach(key => {
+      filesByDoc[key].forEach(file => {
+        // ogni file viene inviato sotto il nome del documento a cui appartiene
+        formData.append(key, file, file.name);
+      });
+    });
+
+    submitBtn.disabled = true;
+    showStatus("Invio in corso...", "loading");
+
+    try {
+      const res = await fetch(WEBHOOK_URL, { method: "POST", body: formData });
+
+      if (res.ok) {
+        showStatus("Documenti inviati con successo! La contatteremo a breve.", "success");
+        form.reset();
+        docKeys.forEach(k => { filesByDoc[k] = []; renderFileList(k); });
+      } else {
+        showStatus("Errore durante l'invio. Riprovi o ci contatti.", "error");
+        submitBtn.disabled = false;
+      }
+    } catch (err) {
+      showStatus("Errore di connessione. Controlli la rete e riprovi.", "error");
+      submitBtn.disabled = false;
+    }
+  });
+
+  function showStatus(text, type) {
+    statusMsg.textContent = text;
+    statusMsg.className = "status-msg " + type;
+  }
+</script>
+
+</body>
+</html>
